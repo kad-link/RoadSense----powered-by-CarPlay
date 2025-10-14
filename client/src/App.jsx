@@ -1,13 +1,15 @@
 import { useState } from 'react'
 import Navbar from './components/Navbar'
 import bgVideo from "../src/assets/car-drive.mp4"
+import MainPage from './components/Main-page'
+import Services from './components/Services'
 
 function App() {
 
   
   return (
     <>
-      <div className='main-screen w-full min-h-screen bg-zinc-900 overflow-hidden'>
+      <div className='main-screen w-full h-screen bg-zinc-900 overflow-hidden'>
         <video
         autoPlay
         loop
@@ -18,8 +20,10 @@ function App() {
 
         <div className="relative z-10">
         <Navbar />
+        <MainPage />
         </div>
       </div>
+      <Services />
     </>
   )
 }
