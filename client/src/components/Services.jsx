@@ -22,7 +22,7 @@ function Services() {
         />
         
         <Card 
-        imgsrc="https://play-lh.googleusercontent.com/uNWmRuwsE-aD49rSF7dO6TY38n5pty2EhfqyIpPQrR6E5NSmyuVsd0kChCMd1IUWGVY=w240-h480-rw"
+        imgsrc="https://badger-website-staging.s3.amazonaws.com/public/images/core/apple-maps-gps.png"
         title="Navigate"
         description="Users can navigate to their preferred destinations with the maps
         feature. It is integrated with Google Maps. The trips are recorded and stored. 
