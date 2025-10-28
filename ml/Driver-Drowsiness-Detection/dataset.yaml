@@ -1,0 +1,5 @@
+path: /Users/santhoshpalnati/Documents/PROJECTS/Driver-Drowsiness-Detection/data/images
+train: ./
+val: ./
+nc: 3
+names: ['asleep', 'alert', 'drowsy']
