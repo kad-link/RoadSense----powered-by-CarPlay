@@ -1,152 +1,4 @@
-// import { FaLocationArrow, FaTimes } from 'react-icons/fa'
-// import {
-//   useJsApiLoader,
-//   GoogleMap,
-//   Marker,
-//   Autocomplete,
-//   DirectionsRenderer,
-// } from '@react-google-maps/api'
-// import { useRef, useState } from 'react'
-
-// const center = { lat: 26.8, lng: 81.02 }
-
-// function Maps() {
-//   const { isLoaded } = useJsApiLoader({
-//     googleMapsApiKey: import.meta.env.VITE_GOOGLE_MAPS_API_KEY,
-//     libraries: ['places'],
-//   })
-
-//   const [map, setMap] = useState(null)
-//   const [directionsResponse, setDirectionsResponse] = useState(null)
-//   const [distance, setDistance] = useState('')
-//   const [duration, setDuration] = useState('')
-
-//   const originRef = useRef()
-//   const destinationRef = useRef()
-
-//   if (!isLoaded) {
-//     return (
-//       <div className="space-y-3 p-4">
-//         <div className="h-4 bg-gray-200 rounded animate-pulse"></div>
-//         <div className="h-4 bg-gray-200 rounded animate-pulse w-5/6"></div>
-//         <div className="h-4 bg-gray-200 rounded animate-pulse w-4/6"></div>
-//       </div>
-//     )
-//   }
-
-//   async function calculateRoute() {
-//     if (originRef.current.value === '' || destinationRef.current.value === '') {
-//       return
-//     }
-//     const directionsService = new google.maps.DirectionsService()
-//     const results = await directionsService.route({
-//       origin: originRef.current.value,
-//       destination: destinationRef.current.value,
-//       travelMode: google.maps.TravelMode.DRIVING,
-//     })
-//     setDirectionsResponse(results)
-//     setDistance(results.routes[0].legs[0].distance.text)
-//     setDuration(results.routes[0].legs[0].duration.text)
-//   }
-
-//   function clearRoute() {
-//     setDirectionsResponse(null)
-//     setDistance('')
-//     setDuration('')
-//     originRef.current.value = ''
-//     destinationRef.current.value = ''
-//   }
-
-//   return (
-//     <div className="relative flex flex-col items-center h-screen w-screen">
-//       <div className="absolute left-0 top-0 h-full w-full">
-//         <GoogleMap
-//           center={center}
-//           zoom={12}
-//           mapContainerStyle={{ width: '100%', height: '100%' }}
-//           options={{
-//             zoomControl: true,
-//             streetViewControl: true,
-//             mapTypeControl: true,
-//             fullscreenControl: true,
-//           }}
-//           onLoad={map => setMap(map)}
-//         >
-//           <Marker position={center} />
-//           {directionsResponse && (
-//             <DirectionsRenderer directions={directionsResponse} />
-//           )}
-//         </GoogleMap>
-//       </div>
-//       <div className="p-4 rounded-lg m-4 bg-white shadow-md min-w-[768px] z-10">
-//         <div className="flex items-center justify-between space-x-2">
-//           <div className="flex-grow">
-//             <Autocomplete>
-//               <input
-//                 type="text"
-//                 placeholder="Origin"
-//                 ref={originRef}
-//                 className="w-full px-4 py-2 border border-black rounded-md outline-none focus:ring-2"
-//               />
-//             </Autocomplete>
-//           </div>
-//           <div className="flex-grow">
-//             <Autocomplete>
-//               <input
-//                 type="text"
-//                 placeholder="Destination"
-//                 ref={destinationRef}
-//                 className="w-full px-4 py-2 border border-black rounded-md outline-none focus:ring-2 "
-//               />
-//             </Autocomplete>
-//           </div>
-
-//           <div className="flex space-x-2">
-//             <button
-//               onClick={calculateRoute}
-//               className="px-4 py-2 bg-black text-white rounded-md 
-//          hover:bg-gradient-to-r hover:from-blue-500 hover:to-green-500 
-//          hover:scale-105 active:scale-95 
-//          shadow-md hover:shadow-xl 
-//          transition-all duration-300 ease-out"
-//             >
-//               Navigate Route
-//             </button>
-//             <button
-//               onClick={clearRoute}
-//               className="p-2 bg-gray-200
-//                text-gray-700 rounded-md
-//                 hover:bg-gray-300 focus:outline-none
-//                  cursor-pointer transition-colors"
-//             >
-//               <FaTimes />
-//             </button>
-//           </div>
-//         </div>
-//         <div className="flex items-center justify-between space-x-4 mt-4">
-//           <p className="text-gray-900">Distance: {distance}</p>
-//           <p className="text-gray-900">Duration: {duration}</p>
-//           <button
-//             onClick={() => {
-//               map.panTo(center)
-//               map.setZoom(15)
-//             }}
-//             className="p-3 bg-gray-200
-//              text-gray-700 rounded-full
-//               hover:bg-gray-300 cursor-pointer 
-//               transition-colors"
-//           >
-//             <FaLocationArrow />
-//           </button>
-//         </div>
-//       </div>
-//     </div>
-//   )
-// }
-
-// export default Maps
-
-import { useState, useRef } from 'react';
+import { useState, useRef, useEffect } from 'react';
 import {
   useJsApiLoader,
   GoogleMap,
@@ -154,36 +6,101 @@ import {
   Autocomplete,
   DirectionsRenderer,
   TransitLayer,
-  BicyclingLayer,
 } from '@react-google-maps/api';
-import { FaLocationArrow, FaTimes, FaPlus, FaCar, FaBus, FaBicycle, FaWalking, FaEdit, FaTrash } from 'react-icons/fa';
+import { FaLocationArrow,FaSignOutAlt, FaTimes,FaUser,  FaPlus, FaCar, FaBus, FaWalking, FaEdit, FaTrash } from 'react-icons/fa';
+import { useAuth } from "../context/AuthContext";
+import { NavLink,useNavigate } from 'react-router-dom';
 
-const center = { lat: 26.8, lng: 81.02 };
+
+const center = { lat: 17.6974, lng: 83.2990 };
 
 const TRAVEL_MODES = {
   DRIVING: { icon: FaCar, label: 'Driving', mode: 'DRIVING' },
   TRANSIT: { icon: FaBus, label: 'Transit', mode: 'TRANSIT' },
-  BICYCLING: { icon: FaBicycle, label: 'Bicycling', mode: 'BICYCLING' },
   WALKING: { icon: FaWalking, label: 'Walking', mode: 'WALKING' },
 };
 
 function Maps() {
+
+
+  const { user, token, logout } = useAuth();
+  const navigate = useNavigate();
+  useEffect(()=>{
+  
+          if(!user){
+              navigate("/"); 
+              return ;
+          }
+  
+              
+          
+      },[ user, navigate])
   const { isLoaded } = useJsApiLoader({
     googleMapsApiKey: import.meta.env.VITE_GOOGLE_MAPS_API_KEY,
     libraries: ['places'],
   });
 
+  
+
   const [map, setMap] = useState(null);
+  const [showUserMenu, setShowUserMenu] = useState(false);
   const [destinations, setDestinations] = useState([]);
   const [activeDestinationIndex, setActiveDestinationIndex] = useState(null);
   const [showModal, setShowModal] = useState(false);
   const [editingIndex, setEditingIndex] = useState(null);
   const [currentTravelMode, setCurrentTravelMode] = useState('DRIVING');
   const [showTransitLayer, setShowTransitLayer] = useState(false);
-  const [showBicyclingLayer, setShowBicyclingLayer] = useState(false);
-
+  const [userLocation, setUserLocation] = useState(null);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState('');
   const originRef = useRef();
   const destinationInputRef = useRef();
+
+
+  function getCurrentLocation() {
+  if (navigator.geolocation) {
+    navigator.geolocation.getCurrentPosition(
+      (position) => {
+        const pos = {
+          lat: position.coords.latitude,
+          lng: position.coords.longitude,
+        };
+        setUserLocation(pos);
+        setLoading(false); 
+        if (originRef.current) {
+          originRef.current.value = { lat: pos.lat, lng: pos.lng };
+        }
+        if (map) {
+          map.panTo(pos);
+        }
+      },
+      (error) => {
+        console.error('Error getting location:', error);
+        alert('Unable to get your location. Please enter manually.');
+      }
+    );
+  } else {
+    alert('Geolocation is not supported by your browser.');
+  }
+}
+
+useEffect(()=>{
+  getCurrentLocation();
+},[])
+
+  if(loading){
+    return <div>Fetching location . . .</div>
+  }
+
+  if (error) {
+    return <div>{error}</div>;
+  }
+
+  if (!userLocation) {
+    return <div>No location available.</div>;
+  }
+
+
 
   if (!isLoaded) {
     return (
@@ -195,8 +112,9 @@ function Maps() {
     );
   }
 
+
   async function calculateRoute(destination, travelMode, isEditing = false, index = null) {
-    const origin = originRef.current?.value || `${center.lat} , ${center.lng}`;
+    const origin = originRef.current?.value ;
      
     if (!destination) return;
 
@@ -228,21 +146,50 @@ function Maps() {
         setActiveDestinationIndex(destinations.length);
       }
 
-      // Update layers based on travel mode
       setShowTransitLayer(travelMode === 'TRANSIT');
-      setShowBicyclingLayer(travelMode === 'BICYCLING');
+      
 
-      // Fit bounds to show the route
       if (map) {
         map.fitBounds(results.routes[0].bounds);
       }
+
+      if(user?.email && token){
+      const response = await fetch(`http://localhost:3000/trip/${user.email}`,{
+          method:"POST",
+          headers:{
+            "Content-Type" : "application/json",
+            // "Authorization": `Bearer ${token}`,
+          },
+          body: JSON.stringify({
+            source: origin,
+            destination: destination,
+            duration:route.duration.text ,
+            distance: route.distance.text,
+          })
+        })
+
+        if (!response.ok) {
+    console.error(`HTTP error! status: ${response.status}`);
+    const errorData = await response.text();
+    console.error('Error details:', errorData);
+    return;
+  }
+
+
+        const data =await response.json();
+        if(response.ok && data.success){
+          console.log("Trip details stored in database ...");
+        }
+      }
     } catch (error) {
       console.error('Error calculating route:', error);
-      alert('Could not calculate route. Please try again.');
+      alert('Inaccessible Route. Please try again');
     }
   }
 
-  function handleAddDestination() {
+     
+
+  async function handleAddDestination() {
     const destination = destinationInputRef.current?.value;
     if (!destination) {
       alert('Please enter a destination');
@@ -270,7 +217,6 @@ function Maps() {
 
   function handleDeleteDestination(index) {
     const updatedDestinations = destinations.filter((_, i) => i !== index);
-    // Reassign labels
     const relabeledDestinations = updatedDestinations.map((dest, i) => ({
       ...dest,
       label: String.fromCharCode(65 + i),
@@ -288,7 +234,7 @@ function Maps() {
     setActiveDestinationIndex(index);
     const destination = destinations[index];
     setShowTransitLayer(destination.travelMode === 'TRANSIT');
-    setShowBicyclingLayer(destination.travelMode === 'BICYCLING');
+    
     
     if (map && destination.directions) {
       map.fitBounds(destination.directions.routes[0].bounds);
@@ -299,8 +245,8 @@ function Maps() {
     <div className="relative flex flex-col items-center h-screen w-screen">
       <div className="absolute left-0 top-0 h-full w-full">
         <GoogleMap
-          center={center}
-          zoom={12}
+          center={userLocation}
+          zoom={10}
           mapContainerStyle={{ width: '100%', height: '100%' }}
           options={{
             zoomControl: false,
@@ -310,10 +256,10 @@ function Maps() {
           }}
           onLoad={map => setMap(map)}
         >
-          <Marker position={center} label="●" />
+          <Marker position={userLocation} label="●" />
           
           {showTransitLayer && <TransitLayer />}
-          {showBicyclingLayer && <BicyclingLayer />}
+          
           
           {destinations.map((dest, index) => (
             index === activeDestinationIndex && dest.directions && (
@@ -332,13 +278,42 @@ function Maps() {
         </GoogleMap>
       </div>
 
+      <div className="absolute top-4 right-4 z-20">
+        <div className="relative">
+          <button
+            onClick={() => setShowUserMenu(!showUserMenu)}
+            className="flex items-center space-x-2 bg-white rounded-full shadow-lg px-4 py-2 hover:shadow-xl transition-shadow"
+          >
+            <div className="w-8 h-8 bg-blue-500 rounded-full flex items-center justify-center text-white font-semibold">
+              {user?.fullName ? user.fullName.charAt(0).toUpperCase() : <FaUser />}
+            </div>
+            <span className="font-medium text-gray-700">{user?.fullName || 'User'}</span>
+          </button>
+
+          {showUserMenu && (
+            <div className="absolute right-0 mt-2 w-64 bg-white rounded-lg shadow-xl py-2 z-30">
+              <div className="px-4 py-3 border-b border-gray-200">
+                <p className="text-sm font-semibold text-gray-900">{user?.fullName || 'User'}</p>
+                <p className="text-sm text-gray-600 truncate">{user?.email || 'user@example.com'}</p>
+              </div>
+              <NavLink 
+              to="/"
+              className="ml-3 "
+              >
+                Go Back
+              </NavLink>
+            </div>
+          )}
+        </div>
+      </div>
+
       <div className="absolute top-4 left-1/2 transform -translate-x-1/2 p-4 rounded-lg bg-white shadow-lg min-w-[600px] z-10">
         <div className="flex items-center space-x-2">
           <Autocomplete className="flex-1">
             <input
               type="text"
-              placeholder="Your location (origin)"
               ref={originRef}
+              placeholder={`Enter source : ${userLocation?.lat ?? ''} ${userLocation?.lng ?? ''}`}
               className="w-full px-4 py-2 border border-gray-300 rounded-md outline-none focus:ring-2 focus:ring-blue-500"
             />
           </Autocomplete>

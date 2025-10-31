@@ -15,6 +15,7 @@ import { AuthProvider } from './context/AuthContext.jsx'
 import Profile from './pages/Profile.jsx'
 import Settings from './pages/Settings.jsx'
 import Dashboard from './pages/Dashboard.jsx'
+import Documents from './pages/Documents.jsx'
 
 
 const router = createBrowserRouter(
@@ -30,6 +31,7 @@ const router = createBrowserRouter(
     <Route path="/profile" element={<> <ScrollToTop /> <Profile /> </>}/>
     <Route path="/dashboard" element={<> <ScrollToTop /> <Dashboard /> </>}/>
     <Route path="/settings" element={<> <ScrollToTop /> <Settings /> </>}/>
+    <Route path="/docs" element={<> <ScrollToTop /> <Documents /> </>}/>
     </>
   )
 )

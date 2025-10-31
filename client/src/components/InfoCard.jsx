@@ -3,7 +3,7 @@ import { MapPin, Navigation, Clock, Calendar } from 'lucide-react';
 import Badge from './Badge';
 
 
-function InfoCard() {
+function InfoCard(props) {
   return (
     <div className="bg-gray-50 w-full max-w-md mx-auto rounded-3xl shadow-lg p-8 border border-gray-200">
       
@@ -19,7 +19,7 @@ function InfoCard() {
         </div>
         <div>
           <p className="text-gray-500 text-sm mb-1">From</p>
-          <p className="text-2xl font-semibold text-black">San Francisco, CA</p>
+          <p className="text-2xl font-semibold text-black">{props.source}</p>
         </div>
       </div>
 
@@ -35,7 +35,7 @@ function InfoCard() {
         </div>
         <div>
           <p className="text-gray-500 text-sm mb-1">To</p>
-          <p className="text-2xl font-semibold text-black">Los Angeles, CA</p>
+          <p className="text-2xl font-semibold text-black">{props.destination}</p>
         </div>
       </div>
 
@@ -47,7 +47,7 @@ function InfoCard() {
             <Navigation className="w-5 h-5 text-gray-500" />
             <span className="text-gray-600 text-base">Distance</span>
           </div>
-          <span className="text-xl font-semibold text-black">383 miles</span>
+          <span className="text-xl font-semibold text-black">{props.distance}</span>
         </div>
 
         <div className="flex items-center justify-between">
@@ -55,7 +55,7 @@ function InfoCard() {
             <Clock className="w-5 h-5 text-gray-500" />
             <span className="text-gray-600 text-base">Duration</span>
           </div>
-          <span className="text-xl font-semibold text-black">5h 45m</span>
+          <span className="text-xl font-semibold text-black">{props.duration}</span>
         </div>
 
         <div className="flex items-center justify-between">
@@ -63,7 +63,7 @@ function InfoCard() {
             <Calendar className="w-5 h-5 text-gray-500" />
             <span className="text-gray-600 text-base">Date</span>
           </div>
-          <span className="text-xl font-semibold text-black">Oct 15, 2025</span>
+          <span className="text-xl font-semibold text-black">{props.date}</span>
         </div>
       </div>
     </div>

@@ -38,10 +38,11 @@ function Services() {
         link="/trips"
         />
         <Card 
-        imgsrc="https://www.mypunepulse.com/wp-content/uploads/2025/09/Legal-Implications-of-Not-Paying-Traffic-Challan-on-Time-and-How-to-Pay-It-Online-1024x576.jpg"
-        title="E-Challans"
-        description="e-challans e-challans e-challans e-challans e-challans e-challans e-challans e-challans 
-        e-challans e-challans e-challans e-challans e-challans e-challans e-challans e-challans"
+        imgsrc="https://www.reliancegeneral.co.in/SiteAssets/RgiclAssets/images/blogs-images/blogImg07.webp"
+        title="Vehicle Documents"
+        description="Keep your RC book, insurance, and service papers organized. Access them instantly whenever
+         you need — safe, digital, and hassle-free. All your vehicle papers — organized, secure, and just a click away."
+        link="/docs"
         />
         <Card 
         imgsrc="https://www.mypunepulse.com/wp-content/uploads/2025/09/Legal-Implications-of-Not-Paying-Traffic-Challan-on-Time-and-How-to-Pay-It-Online-1024x576.jpg"
