@@ -1,26 +1,27 @@
 import mongoose from "mongoose";
 
-const tripSchema = new mongoose.Schema(
+const documentSchema = new mongoose.Schema(
     {
 
-        source: {
+        fileName: {
+            type:String,
+            required: true,
+            unique:true,
+        },
+        date: {
             type:String,
             required: true,
         },
-        destination: {
+        fileSize: {
             type:String,
             required: true,
         },
-        duration: {
+        fileDescription: {
             type:String,
             required: true,
         },
-        distance: {
+        fileURL: {
             type:String,
-            required: true,
-        },
-        date:{
-            type: String,
             required:true,
         },
         user:{
@@ -28,7 +29,8 @@ const tripSchema = new mongoose.Schema(
             ref:"User",
             required:true,
         }
+
     }, {timestamps:true}
 )
 
-export const Trip = mongoose.model("Trip", tripSchema);
+export const UserDocs = mongoose.model("UserDocs", documentSchema);

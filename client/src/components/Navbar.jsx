@@ -40,18 +40,18 @@ function Navbar() {
             >
               Services
             </a>
-            <a
-              href="#about"
+            <NavLink
+              to="/about"
               className="relative after:content-[''] after:absolute after:w-0 after:h-[2px] after:left-0 after:-bottom-1 after:bg-white after:transition-all after:duration-300 hover:after:w-full"
             >
               About
-            </a>
-            <a
-              href="#contact"
+            </NavLink>
+            <NavLink
+              to="/contact"
               className="relative after:content-[''] after:absolute after:w-0 after:h-[2px] after:left-0 after:-bottom-1 after:bg-white after:transition-all after:duration-300 hover:after:w-full"
             >
               Contact
-            </a>
+            </NavLink>
           </div>
 
           {!isAuthenticated ? (
@@ -70,7 +70,7 @@ function Navbar() {
           ) : (
             <div className="relative" ref={dropdownRef}>
               <div
-                className="w-12 h-12 rounded-full bg-gradient-to-br from-blue-500 to-purple-600 flex items-center justify-center text-white font-bold text-xl cursor-pointer hover:scale-105 transition-transform duration-200 shadow-lg"
+                className="w-12 h-12 rounded-full bg-white flex items-center justify-center text-black font-bold text-xl cursor-pointer hover:scale-105 transition-transform duration-200 shadow-lg"
                 onClick={() => setShowDropdown(!showDropdown)}
               >
                 {user?.fullName?.charAt(0).toUpperCase() || 'U'}
@@ -78,7 +78,7 @@ function Navbar() {
 
               {showDropdown && (
                 <div className="absolute right-0 mt-2 w-64 bg-white rounded-lg shadow-2xl overflow-hidden animate-slideDown">
-                  <div className="px-4 py-3 bg-gradient-to-br from-blue-500 to-purple-600 text-white">
+                  <div className="px-4 py-3 bg-white text-black">
                     <p className="font-bold text-lg">{user?.fullName}</p>
                     <p className="text-sm opacity-90">{user?.email}</p>
                     {user?.carModel && (
@@ -118,7 +118,7 @@ function Navbar() {
 
                   <div className="border-t border-gray-200">
                     <button
-                      className="w-full px-4 py-3 text-left text-red-600 hover:bg-red-50 font-semibold transition-colors duration-200"
+                      className="w-full px-4 py-3 text-left cursor-pointer text-red-600 hover:bg-red-500 hover:text-black font-semibold transition-colors duration-200"
                       onClick={handleLogout}
                     >
                       Logout

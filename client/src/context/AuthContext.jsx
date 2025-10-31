@@ -9,7 +9,7 @@ const useAuth = ()=>{
 }
 
 const AuthProvider = ({children})=>{
-    const [user,setUser] = useState("");
+    const [user,setUser] = useState(null);
     const [token,setToken] = useState("");
     const [loading,setLoading] = useState(true);
 
@@ -38,7 +38,7 @@ const AuthProvider = ({children})=>{
     }
     
     const value= {
-        user, token, login, logout, isAuthenticated: !!token
+        user, token, login, logout,loading, isAuthenticated: !!token
     }
 
     return <AuthContext.Provider value={value}>

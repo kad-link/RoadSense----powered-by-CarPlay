@@ -6,6 +6,9 @@ import bcrypt from "bcryptjs";
 import { User } from "./db/models/user.js";
 import express from "express";
 import jwt from "jsonwebtoken";
+import { Trip } from "./db/models/trips.js";
+import { UserDocs } from "./db/models/vehicleDocuments.js";
+import upload from "./middleware/multer.js"
 const app = express();
 
 import cors from "cors";
@@ -146,6 +149,220 @@ app.post("/loginuser",async (req,res)=>{
 })
 
 
+app.post("/trip/:email", async(req,res)=>{
+  try {
+    const {source, destination, duration, distance} =req.body;
+    const {email} = req.params;
+
+
+    if(!source || !destination || !duration || !distance ){
+    return res.status(400).json({
+      success:false,
+      message:"Trip fields incomplete"
+    });
+  } 
+
+  const foundUser = await User.findOne({ email });
+
+  if (!foundUser) {
+  return res.status(404).json({
+    success: false,
+    message: "User not found"
+  });
+}
+
+
+const myDate = new Date();
+const formattedDate = myDate.toLocaleDateString('en-GB'); 
+
+  const newTrip = new Trip({
+    source,
+    destination,
+    duration,
+    distance,
+    user: foundUser._id,
+    date: formattedDate
+  })
+
+  await newTrip.save();
+
+  res.status(201).json({
+    success:true,
+    message:"Trip saved successfully",
+  });
+
+  } catch (error) {
+    console.log(`Trip storing failed : ${error}`);
+    res.status(500).json({
+      success:false,
+      message:"Internal Server Error. Trip storing unsucessful. Try Again . . ."
+    });
+  }
+})
+
+app.get("/trip/:email", async(req,res)=>{
+  try{const {email} = req.params;
+  const isUser = await User.findOne({email});
+
+  if(!isUser){
+    return res.status(404).json({
+      success: false,
+      message: "User not found",
+    })
+  }
+
+  const trips= await Trip.find({user: isUser._id}).sort({_id:-1});
+
+  if(!trips.length){
+    return res.status(200).json({
+      success:true,
+      message:"No trips found for this user",
+      trips: [],
+    })
+  }
+
+  res.status(200).json({
+    success:true,
+    message: "Trips fetched successfully",
+    trips,
+  })}
+  catch(error){
+    console.error("Trip fetching failed : " + error);
+    res.status(500).json({
+      success:false,
+      message:"Internal Server Error. Could not fetch trips.",
+    })
+    
+  }
+})
+
+app.post("/docs/:email", upload.single("file"), async(req,res)=>{
+  try{
+    const {email} = req.params;
+    const { fileDescription } = req.body;
+
+    const isUser= await User.findOne({email});
+
+    if(!isUser){
+    return res.status(404).json({
+      success: false,
+      message: "User not found",
+    })
+  }
+
+  if(!req.file){
+    return res.status(400).json({
+      success:false,
+      message:"No file uploaded",
+    })
+  }
+
+  if(!fileDescription){
+    return res.status(400).json({
+      success: false,
+      message: "File Description is required"
+    })
+  }
+  const fileURL = req.file.path; 
+  const originalName = req.file.originalname;
+  const fileSize= req.file.size;
+
+  const formatFileSize = (bytes) => {
+        if (bytes < 1024) return bytes + ' B';
+        else if (bytes < 1024 * 1024) return (bytes / 1024).toFixed(1) + ' KB';
+        else return (bytes / (1024 * 1024)).toFixed(1) + ' MB';
+      };
+
+    
+
+  console.log("Uploaded File info: ", req.file);
+  console.log("User email: ", req.params.email);
+  console.log("File description: ", req.body.fileDescription);
+
+  const myDate = new Date();
+  const formattedDate = myDate.toLocaleDateString('en-GB');
+
+  const newDoc = new UserDocs({
+    fileName: originalName,
+    date: formattedDate,
+    fileSize: formatFileSize(fileSize),
+    fileDescription,
+    fileURL,
+    user: isUser._id,
+  })
+
+  await newDoc.save();
+
+
+  return res.status(200).json({
+    success:true,
+    message: "File upload successful"
+  })
+  
+  
+  //continue from here
+
+
+
+  }
+  catch(error){
+    console.error("File uploading error: ", error);
+      if (error.code === 11000) {
+      return res.status(400).json({
+        success: false,
+        message: "A file with this name already exists",
+      });
+    }
+
+    return res.status(500).json({
+      success: false,
+      message: "File upload failed",
+      error: error.message
+    });
+
+  }
+})
+
+
+app.get("/docs/:email", async(req,res)=>{
+  
+  try
+  {const {email} = req.params;
+
+  const user = await User.findOne({email});
+
+  if(!user){
+    return res.status(404).json({
+      success:false,
+      message:"User not found",
+    })
+  }
+
+  const documents= await UserDocs.find({user: user._id}).sort({_id:-1});
+
+  if(!documents.length){
+    return res.status(200).json({
+      success:true,
+      message:"No documents found for this user",
+      documents: [],
+    })
+  }
+
+  res.status(200).json({
+    success:true,
+    message:"Documents fetched successfully",
+    documents,
+  })}
+  
+  catch(error){
+    console.error("Documents fetching failed : " , error);
+    res.status(500).json({
+      success:false,
+      message:"Internal Server Error. Could not fetch documents.",
+    })
+  }
+
+})
 
 app.listen(3000, ()=>{
   console.log(`Server running on port 3000`);
