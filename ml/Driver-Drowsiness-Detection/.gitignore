@@ -4,3 +4,4 @@ __pycache__/
 *.pt  # Model weight files (e.g., yolov9c.pt, last.pt)
 runs/ # Training results directory
 data
+.DS_Store
