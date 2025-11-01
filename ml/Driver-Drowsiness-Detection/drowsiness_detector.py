@@ -2,24 +2,9 @@ from ultralytics import YOLO
 import cv2
 import os
 import time
-import threading
-import platform
-from playsound import playsound 
 
 BASE_WEIGHTS = 'yolov8n.pt'
 CUSTOM_MODEL_PATH = 'runs/detect/train/weights/last.pt'
-
-ALARM_PATH = 'beep.m4a'
-
-def sound_alert():
-    def play_alarm():
-        try:
-            playsound(ALARM_PATH)
-        except Exception as e:
-            print(f"⚠️ Could not play alarm: {e}")
-    t = threading.Thread(target=play_alarm)
-    t.daemon = True
-    t.start()
 
 def run_drowsiness_detection():
     load_path = CUSTOM_MODEL_PATH if os.path.exists(CUSTOM_MODEL_PATH) else BASE_WEIGHTS
@@ -28,7 +13,7 @@ def run_drowsiness_detection():
 
     cap = cv2.VideoCapture(0)
     if not cap.isOpened():
-        print("Error: Could not open webcam.")
+        print("❌ Error: Could not open webcam.")
         return
 
     print("✅ Detector running. Press 'q' to quit.")
@@ -39,7 +24,7 @@ def run_drowsiness_detection():
     while True:
         ret, frame = cap.read()
         if not ret:
-            print("Frame grab failed.")
+            print("❌ Frame grab failed.")
             break
 
         results = model(frame, stream=True)
@@ -62,13 +47,8 @@ def run_drowsiness_detection():
                 elapsed = time.time() - alert_start_time
                 if elapsed >= 2 and not alert_triggered:
                     print("⚠️ ALERT: Driver drowsy/asleep for over 2 seconds!")
-                    sound_alert()
                     alert_triggered = True
         else:
-            alert_start_time = None
-            alert_triggered = False
-
-        if 'alert' in detected_classes:
             alert_start_time = None
             alert_triggered = False
 
