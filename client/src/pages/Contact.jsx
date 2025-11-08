@@ -1,16 +1,16 @@
-// Contact.jsx
 import React, { useState } from 'react';
 import { Mail, Phone, MapPin, Shield, Send } from 'lucide-react';
 import { NavLink } from 'react-router-dom';
+import { useAuth } from "../context/AuthContext";
 
 export default function Contact() {
+  const {user} = useAuth();
   const [formData, setFormData] = useState({
-    name: '',
-    email: '',
     subject: '',
     message: ''
   });
   const [submitStatus, setSubmitStatus] = useState('');
+  const [error,setError] = useState(null);
 
   const handleInputChange = (e) => {
     setFormData({
@@ -19,12 +19,48 @@ export default function Contact() {
     });
   };
 
-  const handleSubmit = (e) => {
-    e.preventDefault();
-    setSubmitStatus('Thank you for your message! We will get back to you within 24 hours.');
-    setFormData({ name: '', email: '', subject: '', message: '' });
-    setTimeout(() => setSubmitStatus(''), 5000);
+
+  const handleSubmit = async (e) => {
+  e.preventDefault();
+  setError('');
+  setSubmitStatus('');
+
+  const payload = {
+    name: user?.fullName || formData.name,
+    email: user?.email || formData.email,
+    subject: formData.subject,
+    message: formData.message
   };
+
+  if (!payload.name || !payload.email || !payload.subject || !payload.message) {
+    setError('Please fill in all fields');
+    return;
+  }
+
+  try {
+    console.log('Sending email with data:', payload); 
+    const response = await fetch('http://localhost:3000/send-email', {  
+      method: 'POST',
+      headers: {
+        'Content-Type':'application/json',
+      },
+      body: JSON.stringify(payload),
+    });
+
+    const data = await response.json();
+
+    if (response.ok && data.success) {
+      setSubmitStatus('Thank you for your message! We will get back to you within 24 hours.');
+      setFormData({  subject: '', message: '' });
+      setTimeout(() => setSubmitStatus(''), 5000);
+    } else {
+      setError(data.message || 'Failed to send message. Please try again.');
+    }
+  } catch (err) {
+    setError('Network error. Please check your connection and try again.');
+    console.error('Submit error:', err);
+  } 
+};
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-slate-50 to-blue-50">
@@ -33,8 +69,7 @@ export default function Contact() {
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex justify-between items-center h-16">
             <div className="flex items-center gap-2">
-              <Shield className="w-8 h-8 text-blue-600" />
-              <span className="text-xl font-bold text-gray-900">SafeDrive</span>
+              <span className="text-xl font-bold text-gray-900">ROADSENSE</span>
             </div>
             <div className="flex gap-4">
               
@@ -55,7 +90,7 @@ export default function Contact() {
             Get in Touch
           </h1>
           <p className="text-xl text-gray-600 max-w-2xl mx-auto">
-            Have questions about vehicle safety? We're here to help.
+            Have questions about road safety? We're here to help.
           </p>
         </div>
 
@@ -76,9 +111,9 @@ export default function Contact() {
                 <input
                   type="text"
                   name="name"
-                  value={formData.name}
-                  onChange={handleInputChange}
-                  className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none transition"
+                  value={user?.fullName || ""}
+                  readOnly
+                  className="w-full px-4 py-3 border border-gray-300 rounded-lg  outline-none transition"
                   placeholder="Your full name"
                 />
               </div>
@@ -88,9 +123,9 @@ export default function Contact() {
                 <input
                   type="email"
                   name="email"
-                  value={formData.email}
-                  onChange={handleInputChange}
-                  className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none transition"
+                  value={user?.email || ""}
+                  readOnly
+                  className="w-full px-4 py-3 border border-gray-300 rounded-lg   outline-none transition"
                   placeholder="your.email@example.com"
                 />
               </div>
@@ -121,7 +156,7 @@ export default function Contact() {
 
               <button
                 onClick={handleSubmit}
-                className="w-full bg-blue-600 text-white font-semibold py-3 rounded-lg hover:bg-blue-700 transition-colors flex items-center justify-center gap-2"
+                className="w-full bg-blue-600 cursor-pointer text-white font-semibold py-3 rounded-lg hover:bg-blue-700 transition-colors flex items-center justify-center gap-2"
               >
                 <Send className="w-5 h-5" />
                 Send Message
@@ -141,8 +176,7 @@ export default function Contact() {
                   </div>
                   <div>
                     <h3 className="font-semibold text-gray-900 mb-1">Email</h3>
-                    <p className="text-gray-600">info@safedrive.com</p>
-                    <p className="text-gray-600">support@safedrive.com</p>
+                    <p className="text-gray-600">lit2024002@iiitl.ac.in</p>
                   </div>
                 </div>
 
@@ -152,8 +186,7 @@ export default function Contact() {
                   </div>
                   <div>
                     <h3 className="font-semibold text-gray-900 mb-1">Phone</h3>
-                    <p className="text-gray-600">+1 (555) 123-4567</p>
-                    <p className="text-sm text-gray-500">Mon-Fri, 9AM-6PM EST</p>
+                    <p className="text-gray-600">+91 7989168219</p>
                   </div>
                 </div>
 
@@ -164,9 +197,9 @@ export default function Contact() {
                   <div>
                     <h3 className="font-semibold text-gray-900 mb-1">Address</h3>
                     <p className="text-gray-600">
-                      123 Safety Boulevard<br />
-                      Suite 400<br />
-                      Washington, DC 20001
+                      Ahmamau<br />
+                      IIITL<br />
+                      Lucknow, UP 226002
                     </p>
                   </div>
                 </div>
@@ -174,7 +207,7 @@ export default function Contact() {
             </div>
 
             <div className="bg-gradient-to-br from-blue-600 to-blue-700 rounded-2xl shadow-xl p-8 text-white">
-              <h3 className="text-xl font-bold mb-4">Office Hours</h3>
+              <h3 className="text-xl font-bold mb-4">Active Hours</h3>
               <div className="space-y-2">
                 <div className="flex justify-between">
                   <span>Monday - Friday</span>

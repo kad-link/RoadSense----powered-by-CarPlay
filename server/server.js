@@ -8,10 +8,24 @@ import express from "express";
 import jwt from "jsonwebtoken";
 import { Trip } from "./db/models/trips.js";
 import { UserDocs } from "./db/models/vehicleDocuments.js";
+import { Score } from "./db/models/score.js";
 import upload from "./middleware/multer.js"
+import { Resend } from 'resend';
+import { authMiddleware } from "./middleware/auth.js";
+import admin from "firebase-admin";
+
 const app = express();
 
 import cors from "cors";
+
+admin.initializeApp({
+  credential: admin.credential.cert({
+    projectId: process.env.FIREBASE_PROJECT_ID,
+    clientEmail: process.env.FIREBASE_CLIENT_EMAIL,
+    privateKey: process.env.FIREBASE_PRIVATE_KEY.replace(/\\n/g, '\n') 
+  })
+});
+
 
 app.use(cors({
   origin: 'http://localhost:5173',
@@ -19,12 +33,15 @@ app.use(cors({
   credentials: true
 }));
 
-app.use(express.json());
-app.use(express.urlencoded({ extended: true }));
+app.use(express.json({ limit: '50mb' }));
+app.use(express.urlencoded({ limit: '50mb', extended: true }));
+
 
 connectDB();
 
 const JWT_SECRET = process.env.JWT_SECRET;
+const resend = new Resend(process.env.RESEND_API_KEY);
+
 
 app.get("/", (req,res)=>{
     res.send("Coconut Breaks Here !");
@@ -149,7 +166,7 @@ app.post("/loginuser",async (req,res)=>{
 })
 
 
-app.post("/trip/:email", async(req,res)=>{
+app.post("/trip/:email",authMiddleware ,async(req,res)=>{
   try {
     const {source, destination, duration, distance} =req.body;
     const {email} = req.params;
@@ -236,8 +253,11 @@ app.get("/trip/:email", async(req,res)=>{
   }
 })
 
-app.post("/docs/:email", upload.single("file"), async(req,res)=>{
+app.post("/docs/:email", authMiddleware,upload.single("file"), async(req,res)=>{
   try{
+
+  
+
     const {email} = req.params;
     const { fileDescription } = req.body;
 
@@ -299,13 +319,12 @@ app.post("/docs/:email", upload.single("file"), async(req,res)=>{
     message: "File upload successful"
   })
   
-  
-  //continue from here
-
-
 
   }
   catch(error){
+
+ 
+
     console.error("File uploading error: ", error);
       if (error.code === 11000) {
       return res.status(400).json({
@@ -360,6 +379,233 @@ app.get("/docs/:email", async(req,res)=>{
       success:false,
       message:"Internal Server Error. Could not fetch documents.",
     })
+  }
+
+})
+
+app.post("/score/:email",authMiddleware ,async(req,res)=>{
+
+
+
+  try {
+
+    const {email} = req.params;
+    const {score} =req.body;
+    
+
+
+    if(!score ){
+    return res.status(400).json({
+      success:false,
+      message:"Score saving failed"
+    });
+  } 
+
+  const foundUser = await User.findOne({ email });
+
+  if (!foundUser) {
+  return res.status(404).json({
+    success: false,
+    message: "User not found"
+  });
+}
+
+
+const myDate = new Date();
+const formattedDate = myDate.toLocaleDateString('en-GB'); 
+
+  const newScore = new Score({
+    score,
+    user: foundUser._id,
+    date: formattedDate
+  })
+
+  await newScore.save();
+
+  res.status(201).json({
+    success:true,
+    message:"Score saved successfully",
+  });
+
+  } catch (error) {
+    console.log(`Score storing failed : ${error}`);
+    res.status(500).json({
+      success:false,
+      message:"Internal Server Error. Score saving unsucessful. Try Again . . ."
+    });
+  }
+})
+
+app.get("/score/:email", async(req,res)=>{
+  try
+  {
+    const {email} = req.params;
+
+  const user = await User.findOne({email});
+
+  if(!user){
+    return res.status(404).json({
+      success:false,
+      message:"User not found",
+    })
+  }
+
+  const scores= await Score.find({user: user._id}).sort({_id:-1});
+
+  if(!scores.length){
+    return res.status(200).json({
+      success:true,
+      message:"No past trips found for this user",
+      scores
+    })
+  }
+
+  res.status(200).json({
+    success:true,
+    message:"Documents fetched successfully",
+    scores,
+  })}
+  
+  catch(error){
+    console.error("Scores fetching failed : " , error);
+    res.status(500).json({
+      success:false,
+      message:"Internal Server Error. Could not fetch scores.",
+    })
+  }
+})
+
+
+app.post("/send-email", async (req, res) => {
+  try {
+
+    const { name, email, subject, message } = req.body;
+    console.log('Extracted fields:', { name, email, subject, message });
+
+    
+
+    
+    if (!name || !email || !subject || !message) {
+      return res.status(400).json({ 
+        success: false, 
+        message: 'All fields are required' 
+      });
+    }
+
+    
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    if (!emailRegex.test(email)) {
+      return res.status(400).json({ 
+        success: false, 
+        message: 'Invalid email format' 
+      });
+    }
+
+    const data = await resend.emails.send({
+      from: 'RoadSense <onboarding@resend.dev>', 
+      to: ['sricharanchittineni@gmail.com'],
+      replyTo: email,
+      subject: `Contact Form: ${subject}`,
+      html: `
+        <!DOCTYPE html>
+        <html>
+          <head>
+            <style>
+              body { font-family: Arial, sans-serif; line-height: 1.6; color: #333; }
+              .container { max-width: 600px; margin: 0 auto; padding: 20px; }
+              .header { background: #2563eb; color: white; padding: 20px; border-radius: 8px 8px 0 0; }
+              .content { background: #f9fafb; padding: 20px; border: 1px solid #e5e7eb; }
+              .field { margin-bottom: 15px; }
+              .label { font-weight: bold; color: #1f2937; }
+              .value { color: #4b5563; margin-top: 5px; }
+              .footer { text-align: center; padding: 20px; color: #6b7280; font-size: 12px; }
+            </style>
+          </head>
+          <body>
+            <div class="container">
+              <div class="header">
+                <h2>Contact Form Submission - RoadSense</h2>
+              </div>
+              <div class="content">
+                <div class="field">
+                  <div class="label">From:</div>
+                  <div class="value">${name}</div>
+                </div>
+                <div class="field">
+                  <div class="label">Email:</div>
+                  <div class="value">${email}</div>
+                </div>
+                <div class="field">
+                  <div class="label">Subject:</div>
+                  <div class="value">${subject}</div>
+                </div>
+                <div class="field">
+                  <div class="label">Message:</div>
+                  <div class="value">${message.replace(/\n/g, '<br>')}</div>
+                </div>
+              </div>
+              <div class="footer">
+                <p>This email was sent from RoadSense contact form</p>
+              </div>
+            </div>
+          </body>
+        </html>
+      `
+    });
+
+    console.log('Mailed successfully:', data);
+    
+    return res.status(200).json({ 
+      success: true, 
+      message: 'Email sent successfully'
+    });
+
+  } catch (error) {
+    console.error('Resend error:', error);
+    return res.status(500).json({ 
+      success: false, 
+      message: 'Failed to send email. Please try again later.' 
+    });
+  }
+});
+
+app.post("/Glogin", async(req,res)=>{
+
+  const { token} = req.body;
+
+  try {
+    const decoded = await admin.auth().verifyIdToken(token);
+
+    let user = await User.findOne({ email: decoded.email });
+
+    if (!user) {
+      user = await User.create({
+        email: decoded.email,
+        fullName: decoded.name,
+        authProvider: "google",
+        googleUID: decoded.uid,
+        profilePic: decoded.picture,
+      });
+    }
+
+    const JWTtoken = jwt.sign(
+      { userId: user._id, email: user.email },
+      process.env.JWT_SECRET,
+      { expiresIn: "7d" }
+    );
+
+    res.json({
+      success: true,
+      token: JWTtoken,
+      user 
+    });
+
+
+  } catch (error) {
+    console.error(error);
+    res.status(401).json({
+      success: false,
+      message: "Invalid Google token" });
   }
 
 })

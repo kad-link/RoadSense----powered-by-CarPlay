@@ -3,6 +3,7 @@ import Navbar from '../components/Navbar'
 import MainPage from '../components/Main-page'
 import Services from '../components/Services'
 import bgVideo from "../assets/car-drive.mp4"
+import Footer from '../components/Footer'
 
 
 function Home() {

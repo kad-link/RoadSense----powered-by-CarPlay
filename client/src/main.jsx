@@ -16,11 +16,12 @@ import Profile from './pages/Profile.jsx'
 import Settings from './pages/Settings.jsx'
 import Dashboard from './pages/Dashboard.jsx'
 import Documents from './pages/Documents.jsx'
-
+import DrowsinessDetector from './pages/DrowsinessDetector.jsx'
+import Layout from "./components/Layout.jsx"
 
 const router = createBrowserRouter(
   createRoutesFromElements(
-    <>
+    <Route element={<Layout />}>
     <Route path= "/" element= {<Home />}  />
     <Route path="/register" element={<> <ScrollToTop /> <Register /> </>}/>
     <Route path="/login" element={<> <ScrollToTop /> <Login /> </>}/>
@@ -32,7 +33,8 @@ const router = createBrowserRouter(
     <Route path="/dashboard" element={<> <ScrollToTop /> <Dashboard /> </>}/>
     <Route path="/settings" element={<> <ScrollToTop /> <Settings /> </>}/>
     <Route path="/docs" element={<> <ScrollToTop /> <Documents /> </>}/>
-    </>
+    <Route path="/safety" element={<> <ScrollToTop /> <DrowsinessDetector /> </>}/>
+    </Route>
   )
 )
 
