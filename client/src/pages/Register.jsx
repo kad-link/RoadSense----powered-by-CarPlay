@@ -48,7 +48,7 @@ function Register() {
        const idToken = await result.user.getIdToken();
       
      
-       const response = await fetch("http://localhost:3000/Glogin", {
+       const response = await fetch(`${import.meta.env.VITE_BACKEND_URL}/Glogin`, {
          method: "POST",
          headers: {
            "Content-Type": "application/json",
@@ -85,7 +85,7 @@ function Register() {
     setLoading(true);
 
     try {
-      const response = await fetch("http://localhost:3000/registeruser", {
+      const response = await fetch(`${import.meta.env.VITE_BACKEND_URL}/registeruser`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",

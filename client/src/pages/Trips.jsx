@@ -27,13 +27,12 @@ function Trips() {
 
         if(loading) return ;
         if(!user){
-            // window.alert("Please Sign In first");
             navigate("/"); 
             return ;
         }
 
         setLoading(true); 
-        fetch(`http://localhost:3000/trip/${user.email}`,{
+        fetch(`${import.meta.env.VITE_BACKEND_URL}/trip/${user.email}`,{
         method: "GET",
         headers: {
             "Content-Type": "application/json",
