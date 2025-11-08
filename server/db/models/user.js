@@ -15,12 +15,24 @@ const userSchema = new mongoose.Schema(
         },
         password:{
             type:String,
-            required:true
+            required:function () {
+                return this.authProvider === "local";
+                    }, 
         },
         carModel:{
             type:String
-        }
-
+        },
+        authProvider: {
+            type: String,
+            enum: ["local", "google"],
+            default: "local",
+        },
+        googleUID: {
+            type: String,
+        },
+        profilePic: {
+            type: String,
+        },
     }, {timestamps:true}
 )
 

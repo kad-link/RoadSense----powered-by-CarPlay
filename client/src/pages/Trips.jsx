@@ -33,7 +33,14 @@ function Trips() {
         }
 
         setLoading(true); 
-        fetch(`http://localhost:3000/trip/${user.email}`)
+        fetch(`http://localhost:3000/trip/${user.email}`,{
+        method: "GET",
+        headers: {
+            "Content-Type": "application/json",
+            "Authorization": `Bearer ${token}`,  
+      },
+
+        })
         .then(res=>res.json())
         .then(data=>{
             if(data.success){

@@ -1,5 +1,5 @@
 import React, { useMemo } from 'react';
-import { Folder } from 'lucide-react';
+import { Folder,  Eye } from 'lucide-react';
 
 export default function DocCard(props) {
   const gradients = [
@@ -16,6 +16,13 @@ export default function DocCard(props) {
   const randomGradient = useMemo(() => {
     return gradients[Math.floor(Math.random() * gradients.length)];
   }, []);
+
+  const handleViewFile = () => {
+    if (props.fileURL) {
+      window.open(props.fileURL, '_blank');
+    }
+  };
+
 
   return (
     <div className="w-[50vh] max-w-md ">
@@ -40,6 +47,14 @@ export default function DocCard(props) {
       <div className="bg-white rounded-b-2xl p-4 border border-t-0 border-gray-200">
         <div className="flex items-center justify-between">
           <span className="text-gray-700 font-medium">{props.size}</span>
+          <button
+            onClick={handleViewFile}
+            className="bg-blue-600 hover:bg-blue-700 text-white p-2 rounded-lg transition-colors flex items-center gap-2"
+            title="View document"
+          >
+            <Eye size={18} />
+            <span className="text-sm font-medium">View</span>
+          </button>
         </div>
       </div>
     </div>

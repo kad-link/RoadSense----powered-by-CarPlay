@@ -8,7 +8,7 @@ import DocCard from '../components/DocCard';
 
 export default function Documents() {
 
-    const { user ,loading} = useAuth();
+    const { user ,token ,loading} = useAuth();
     const navigate = useNavigate();
     const [searchQuery, setSearchQuery] = useState('');
     const [uploading, setUploading] = useState(false);
@@ -35,7 +35,12 @@ export default function Documents() {
           setLoadingDocs(true);
 
           try {
-            const response =await fetch(`http://localhost:3000/docs/${user.email}`);
+            const response =await fetch(`http://localhost:3000/docs/${user?.email}`,{
+              method: "GET",
+              headers: {
+                "Authorization": `Bearer ${token}`,  
+              },
+            });
             const data =await response.json();
 
             if(data.success){
@@ -91,6 +96,9 @@ export default function Documents() {
 
             const response = await fetch(`http://localhost:3000/docs/${user.email}`,{
               method:"POST",
+              headers:{
+                "Authorization": `Bearer ${token}`
+              },
               body: formData,
             })
 
@@ -264,6 +272,7 @@ export default function Documents() {
                         name={doc.fileName} 
                         description={doc.fileDescription} 
                         size={doc.fileSize}
+                        fileURL={doc.fileURL}
                     />
                 ))
             )}

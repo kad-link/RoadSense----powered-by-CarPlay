@@ -1,6 +1,9 @@
 matplotlib
 numpy
-opencv-python
+opencv-python-headless==4.10.0.84
 ultralytics
-pyobjc
-playsound
+flask==3.0.0
+flask-cors==4.0.0
+flask-socketio==5.3.5
+python-socketio==5.10.0
+eventlet
