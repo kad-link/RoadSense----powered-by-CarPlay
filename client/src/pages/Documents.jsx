@@ -35,7 +35,7 @@ export default function Documents() {
           setLoadingDocs(true);
 
           try {
-            const response =await fetch(`http://localhost:3000/docs/${user?.email}`,{
+            const response =await fetch(`${import.meta.env.VITE_BACKEND_URL}/docs/${user?.email}`,{
               method: "GET",
               headers: {
                 "Authorization": `Bearer ${token}`,  
@@ -94,7 +94,7 @@ export default function Documents() {
         try {
             
 
-            const response = await fetch(`http://localhost:3000/docs/${user.email}`,{
+            const response = await fetch(`${import.meta.env.VITE_BACKEND_URL}/docs/${user.email}`,{
               method:"POST",
               headers:{
                 "Authorization": `Bearer ${token}`

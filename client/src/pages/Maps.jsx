@@ -154,7 +154,7 @@ useEffect(()=>{
       }
 
       if(user?.email && token){
-      const response = await fetch(`http://localhost:3000/trip/${user.email}`,{
+      const response = await fetch(`${import.meta.env.VITE_BACKEND_URL}/trip/${user.email}`,{
           method:"POST",
           headers:{
             "Content-Type" : "application/json",

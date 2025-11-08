@@ -51,7 +51,7 @@ const DrowsinessDetector = () => {
   const fetchScoreHistory = async () => {
     setLoadingScores(true);
     try {
-      const response = await fetch(`http://localhost:3000/score/${user.email}`,{
+      const response = await fetch(`${import.meta.env.VITE_BACKEND_URL}/score/${user.email}`,{
         method: "GET",
         headers: {
             "Content-Type": "application/json",
@@ -245,7 +245,7 @@ const DrowsinessDetector = () => {
 
          try {
 
-        const response = await fetch(`http://localhost:3000/score/${user.email}`, {
+        const response = await fetch(`${import.meta.env.VITE_BACKEND_URL}/score/${user.email}`, {
           method:"POST",
           headers:{
             "Content-Type": "application/json",
